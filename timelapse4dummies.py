@@ -14,11 +14,21 @@
 ##    Licencia General Pública (GPL)    ##
 ##########################################
 
-
-from Tkinter import *
-from tkFileDialog import *
-#from PIL import Image
 import os, sys, shutil, glob
+
+# Averiguamos la versión de Python:
+print ("Versión de Python: " + str(sys.version_info))
+
+# Dependiendo de la versión de Python 
+# importamos tkinter de una forma u otra.
+if sys.version_info[:2] < (3,0):
+	from Tkinter import *
+	from tkFileDialog import *
+elif sys.version_info[:2] >= (3,0):
+	from tkinter import *
+	from tkinter.filedialog import *
+
+#from PIL import Image
 #import Image
 
 ## Declaración de variables ##
@@ -26,7 +36,9 @@ returned_values = {}
 returned_values['original'] = ""
 returned_values['temporal'] = ""
 directorio_origen = os.getcwd()
-directorio_temporal = os.environ['HOME']
+#directorio_temporal = os.environ["HOME"]
+directorio_temporal = os.path.expanduser("~")
+
 horizontal = 1920
 vertical = 1080
 nfps = 25
@@ -63,25 +75,27 @@ def fredimensionar(origen, temporal, horizontal, vertical, nfps, nombreVideo):
 	else:
 		extension = "jpg"
 	if numeroFotos > 0:
-		print "Se han encontrado " + str(numeroFotos) + " de fotos."
+		print ("Se han encontrado " + str(numeroFotos) + " de fotos.")
 	else:
-		print "No hay fotos, no hay timelapse :-("
-		print "Saliendo del programa."
+		print ("No hay fotos, no hay timelapse :-(")
+		print ("Saliendo del programa.")
 		#root.quit
 		#salir()
 	#'''
 	
 	#print 'Creamos un directorio temporal dentro del temporal'
-	os.mkdir(temporal + "/temporal")
+	temporalTemporal = (temporal + "/temporal")
+	if os.path.isdir(temporalTemporal) == False:
+		os.mkdir(temporal + "/temporal")
 	for foto in glob.glob1(origen,"*." + extension): # + glob.glob1(origen,"*.JPG"):
-		print "Redimensionando " + foto
+		print ("Redimensionando " + foto)
 		numeroFotos = numeroFotos - 1
-		print "Faltan " + str(numeroFotos) + " fotos por redimensionar."
+		print ("Faltan " + str(numeroFotos) + " fotos por redimensionar.")
 		#comando = "convert -scale " + str(horizontal) + "x " + origen + "/" + foto + " " + temporal + "/temporal/" + foto
 		copiaYredimensiona = "convert -scale " + str(horizontal) + "x" + str(vertical) + " " + origen + "/" + foto + " " + temporal + "/temporal/" + foto
-		#print copiaYredimensiona
+		print (copiaYredimensiona)
 		os.system(copiaYredimensiona)
-		print ""
+		print ("")
 	
 	tmp = str(temporal)
 	ext = str(extension)
@@ -89,17 +103,17 @@ def fredimensionar(origen, temporal, horizontal, vertical, nfps, nombreVideo):
 	nVideo = str(nombreVideo)
 	crearVideo = "mencoder mf://"+tmp+"/temporal/*."+ext+" -mf fps="+fps+":type=jpg -ovc lavc  -lavcopts vcodec=ffvhuff  -o "+tmp+"/" + nVideo
 	#mencoder mf://*.jpg -mf fps=8 w=800:h=600:fps=25:type=jpg -ovc lavc -o ./video.avi
-	print crearVideo
+	print (crearVideo)
 	os.system(crearVideo)
 	#mencoder mf://$directorio_destino/*.jpg -mf fps=$nfps:type=jpeg -ovc lavc -lavcopts vcodec=mjpeg -o $nombre_video.avi;
-	print "Video finalizado."
-	print "Puede salir del programa."
+	print ("Video finalizado.")
+	print ("Puede salir del programa.")
 		
 	#'''
 	
 	#if 
 	#print "Borramos el directorio"
-	shutil.rmtree( temporal + "/temporal")
+	#shutil.rmtree( temporal + "/temporal")
 	
 '''	
 	# open an image file (.bmp,.jpg,.png,.gif) you have in the working folder
@@ -125,7 +139,7 @@ region = im.crop(box)
 ## Seleccionamos el directorio del que copiaremos las fotografías.
 def fDirectorioOrigen():
 
-	print "Seleccione el directorio donde se encuentran las fotografías"
+	print ("Seleccione el directorio donde se encuentran las fotografías")
 	# Preguntamos por el directorio.
 	directorioOrigen=askdirectory()
 	# Convertimos a string el resultado.
@@ -139,7 +153,7 @@ def fDirectorioOrigen():
 ## y el archivo de video resultante.
 def fDirectorioTemporal():
 
-	print "Seleccione un directorio temporal"
+	print ("Seleccione un directorio temporal")
 	# Preguntamos por el directorio
 	directorioTemporal=askdirectory()
 	# Convertimos a string el resultado
@@ -200,34 +214,36 @@ def salir():
 	root.quit
 
 def main():
-	print ""
-	print "procediendo..."
+	print ("")
+	print ("procediendo...")
 	fResolucion()
 	H,V,F = fResolucion()
 	# Si no se ha seleccionado ningún directorio de origen
 	# el valor de returned_values['original'] = ""
 	# así que le asignamos el valor del directorio personal del usuario.
 	if returned_values['original']== "":
-		original = str(os.environ['HOME'])
+		#original = str(os.environ['HOME'])
+		original = os.path.expanduser("~")
 	else:
 		original = str(returned_values['original'])
-	print "Directorio origen: " + original
+	print ("Directorio origen: " + original)
 	
 	
 	# Si no se ha seleccionado ningún directorio temporal
 	# el valor de returned_values['temporal'] = ""
 	# así que le asignamos el valor del directorio personal del usuario.
 	if returned_values['temporal']== "":
-		temporal = str(os.environ['HOME'])
+		#temporal = str(os.environ['HOME'])
+		temporal = os.path.expanduser("~")
 	else:
 		temporal = str(returned_values['temporal'])
-	print "Directorio temporal: " + temporal
+	print ("Directorio temporal: " + temporal)
 	
-	print "Resolución horizontal: " + str(H)
-	print "Resolución vertical: " + str(V)
-	print "Número de fotogramas por segundo: " + str(F)
+	print ("Resolución horizontal: " + str(H))
+	print ("Resolución vertical: " + str(V))
+	print ("Número de fotogramas por segundo: " + str(F))
 	video = fNombreVideo()
-	print "Nombre del video: " + video
+	print ("Nombre del video: " + video)
 	#ejecutar = fredimensionar(original, temporal, H, V)
 	ejecutar = fredimensionar(original, temporal, H, V, F, video)
 
@@ -249,7 +265,7 @@ origen = Label(root, text="Directorio con las fotografías:")
 origen.grid(sticky=E)
 
 #Directorio temporal donde se copiarán para finalmente ser borradas.
-destino = Label(root, text="Directorio temporal donde se copiarán: \n Déjelo en blanco si tiene dudas. \n El programa generará un directorio \n y lo borrará cuando finalice el proceso.")
+destino = Label(root, text="Directorio donde se copiarán las imágenes,\n (que después se borrarán)\n y el video resultante.")
 destino.grid(sticky=E)
 
 #Cuadro de dialogo donde se escribirá el nombre del video resultante.
@@ -262,10 +278,10 @@ textoNombreVideo = Entry(root, textvariable=varNombreVideo)
 textoNombreVideo.grid(row=2, column=1, padx=10, pady=10)
 
 varOrigen = StringVar() 
-origen = Button(root, text="Seleccionar origen", bg="cyan", activebackground="red",activeforeground="white", height=2, command=fDirectorioOrigen)
+origen = Button(root, text="Seleccionar carpeta origen", bg="cyan", activebackground="red",activeforeground="white", height=2, command=fDirectorioOrigen)
 origen.grid(row=0, column=1, padx=10, pady=10)
  
-temporal = Button(root, text="Seleccionar temporal", bg="red", fg="white", height=2, command=fDirectorioTemporal)
+temporal = Button(root, text="Seleccionar carpeta destino", bg="red", fg="white", height=2, command=fDirectorioTemporal)
 temporal.grid(row=1, column=1, padx=10, pady=10)
 
 resolucion = IntVar()
