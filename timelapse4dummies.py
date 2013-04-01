@@ -61,7 +61,7 @@ def fredimensionar(origen, destino, horizontal, vertical, nfps, nombreVideo):
 	else:
 		extension = "jpg"
 	if numeroFotos > 0:
-		print ("Se han encontrado " + str(numeroFotos) + " de fotos.")
+		print ("Se han encontrado " + str(numeroFotos) + " fotos.")
 	else:
 		print ("No hay fotos, no hay timelapse :-(")
 		print ("Saliendo del programa.")
@@ -94,8 +94,10 @@ def fredimensionar(origen, destino, horizontal, vertical, nfps, nombreVideo):
 		#print (cropFoto) 
 		os.system(copiaYredimensiona)
 		os.system(cropFoto)
-		os.remove(Temporal + "/" + fotoName + "-1.jpg")
-		os.rename(Temporal + "/" + fotoName + "-0.jpg", Temporal + "/" + fotoName + ".jpg")
+		if os.path.isfile(Temporal + "/" + fotoName + "-1.jpg") == True:
+			os.remove(Temporal + "/" + fotoName + "-1.jpg")
+		if os.path.isfile(Temporal + "/" + fotoName + "-0.jpg") == True:
+			os.rename(Temporal + "/" + fotoName + "-0.jpg", Temporal + "/" + fotoName + ".jpg")
 		
 		numeroFotos = numeroFotos - 1
 		print ("Faltan " + str(numeroFotos) + " fotos por redimensionar.")
@@ -144,7 +146,7 @@ def fDirectorioOrigen():
 	# Preguntamos por el directorio.
 	directorioOrigen=askdirectory()
 	# Convertimos a string el resultado.
-	origen = str(directorioOrigen)
+	origen = str(directorioOrigen.encode('utf-8'))
 	# Guardamos la variable de forma que podamos acceder a ella.
 	returned_values['origen'] = origen
 	#print origen
@@ -158,7 +160,7 @@ def fDirectorioDestino():
 	# Preguntamos por el directorio
 	directorioDestino=askdirectory()
 	# Convertimos a string el resultado
-	destino = str(directorioDestino)
+	destino = str(directorioDestino.encode('utf-8'))
 	# Guardamos la variable de forma que podamos acceder a ella.
 	returned_values['destino'] = destino
 	return directorioDestino
